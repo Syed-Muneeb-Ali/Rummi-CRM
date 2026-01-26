@@ -11,7 +11,7 @@ const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true, unique: true },
-  passwordHash: { type: String },
+  passwordHash: { type: String, select: false },
   biometricId: { type: String },
   roleId: { type: Schema.Types.ObjectId, ref: "Role", required: true },
   franchiseId: { type: Schema.Types.ObjectId, ref: "Franchise" },

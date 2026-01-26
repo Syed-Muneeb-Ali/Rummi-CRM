@@ -1,103 +1,91 @@
- "use client"
+"use client"
 
- import * as React from "react"
- import { zodResolver } from "@hookform/resolvers/zod"
- import {
-   FormProvider,
-   useForm,
-   type DefaultValues,
-   type FieldValues,
-   type SubmitHandler,
- } from "react-hook-form"
- import type { ZodSchema, ZodTypeDef, TypeOf } from "zod"
+import * as React from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
+import {
+  useForm,
+  type FieldValues,
+  type SubmitHandler,
+  type Path,
+  type ControllerRenderProps,
+  type ControllerFieldState,
+  type UseFormStateReturn,
+} from "react-hook-form"
+import type { z } from "zod"
 
- import { cn } from "@/lib/utils"
- import {
-   Form,
-   FormControl,
-   FormDescription,
-   FormField,
-   FormItem,
-   FormLabel,
-   FormMessage,
- } from "@/components/ui/form"
+import { cn } from "@/lib/utils"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 
- function ZodForm<TSchema extends ZodSchema<any, ZodTypeDef, any>>({
-   schema,
-   defaultValues,
-   onSubmit,
-   children,
-   className,
- }: ZodFormProps<TSchema>) {
-   type FormValues = TypeOf<TSchema>
+interface ZodFormProps<TSchema extends z.ZodType<any, any, any>> {
+  schema: TSchema
+  defaultValues?: Partial<z.infer<TSchema>>
+  onSubmit: (values: z.infer<TSchema>) => void
+  children: React.ReactNode
+  className?: string
+}
 
-   const methods = useForm<FormValues>({
-     resolver: zodResolver(schema),
-     defaultValues: defaultValues as DefaultValues<FormValues>,
-     mode: "onBlur",
-   })
+function ZodForm<TSchema extends z.ZodType<any, any, any>>({
+  schema,
+  defaultValues,
+  onSubmit,
+  children,
+  className,
+}: ZodFormProps<TSchema>) {
+  type FormValues = z.infer<TSchema>
 
-   const handleSubmit: SubmitHandler<FormValues> = values => {
-     onSubmit({ values })
-   }
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema) as unknown as Resolver<FormValues>,
+    defaultValues: defaultValues as FormValues,
+    mode: "onBlur",
+  })
 
-   return (
-     <FormProvider {...methods}>
-       <Form {...methods}>
-         <form
-           onSubmit={methods.handleSubmit(handleSubmit)}
-           className={cn("space-y-4", className)}
-         >
-           {children}
-         </form>
-       </Form>
-     </FormProvider>
-   )
- }
+  const handleSubmit: SubmitHandler<FormValues> = (values) => {
+    onSubmit(values)
+  }
 
- function ZodFormField<TFieldValues extends FieldValues>({
-   name,
-   render,
- }: ZodFormFieldProps<TFieldValues>) {
-   return (
-     <FormField
-       name={name}
-       render={({ field, fieldState }) =>
-         render({ field, fieldState })
-       }
-     />
-   )
- }
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className={cn("space-y-4", className)}
+      >
+        {children}
+      </form>
+    </Form>
+  )
+}
 
- export {
-   ZodForm,
-   ZodFormField,
-   FormItem,
-   FormLabel,
-   FormControl,
-   FormDescription,
-   FormMessage,
- }
+interface ZodFormFieldProps<TFieldValues extends FieldValues> {
+  name: Path<TFieldValues>
+  render: (args: {
+    field: ControllerRenderProps<TFieldValues, Path<TFieldValues>>
+    fieldState: ControllerFieldState
+    formState: UseFormStateReturn<TFieldValues>
+  }) => React.ReactElement
+}
 
- interface ZodFormProps<TSchema extends ZodSchema<any, ZodTypeDef, any>> {
-   schema: TSchema
-   defaultValues?: Partial<TypeOf<TSchema>>
-   onSubmit: ({ values }: { values: TypeOf<TSchema> }) => void
-   children: React.ReactNode
-   className?: string
- }
+function ZodFormField<TFieldValues extends FieldValues>({
+  name,
+  render,
+}: ZodFormFieldProps<TFieldValues>) {
+  return <FormField name={name} render={render} />
+}
 
- interface ZodFormFieldProps<TFieldValues extends FieldValues> {
-   name: keyof TFieldValues & string
-   render: (args: {
-     field: any
-     fieldState: {
-       invalid: boolean
-       isTouched: boolean
-       isDirty: boolean
-       error: { message?: string } | undefined
-     }
-   }) => React.ReactNode
- }
-
-
+export {
+  ZodForm,
+  ZodFormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+}

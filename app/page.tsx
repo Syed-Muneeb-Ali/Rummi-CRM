@@ -1,16 +1,26 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+"use client"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function Home() {
+  const router = useRouter()
+  const { isAuthenticated, isLoading } = useAuth()
+  
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.push("/dashboard")
+      } else {
+        router.push("/login")
+      }
+    }
+  }, [isAuthenticated, isLoading, router])
+  
   return (
-    <div className="p-10">
-      <Card className="max-w-md">
-        <CardContent className="p-6 space-y-4">
-          <h1 className="text-xl font-semibold">Rummi CRM</h1>
-          <p>Franchise Sales & Operations Platform</p>
-          <Button>Login</Button>
-        </CardContent>
-      </Card>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-muted-foreground">Loading...</div>
     </div>
   )
 }
