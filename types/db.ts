@@ -520,3 +520,12 @@ export interface IInventoryItem {
   createdBy: Types.ObjectId
 }
 
+// Attendance types
+export interface IAttendance {
+  _id: Types.ObjectId
+  userId: Types.ObjectId
+  date: string // YYYY-MM-DD format
+  loginTime: Date
+  createdAt: Date
+  updatedAt: Date
+}

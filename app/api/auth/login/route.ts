@@ -6,6 +6,7 @@ import Session from "@/lib/db/models/session"
 import { verifyPassword } from "@/lib/auth/password"
 import { generateSessionToken, getSessionCookieName, getSessionCookieOptions } from "@/lib/auth/token"
 import { logLogin } from "@/lib/auth/audit"
+import { logAttendance } from "@/lib/utils/attendance-logger"
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -61,9 +62,12 @@ export async function POST(request: NextRequest) {
       expiresAt,
       lastActivityAt: new Date(),
     })
-    
+
     await logLogin(user._id, ipAddress, userAgent)
-    
+
+    // Log attendance (first login of the day)
+    await logAttendance(user._id.toString())
+
     const cookieOptions = getSessionCookieOptions()
     
     const response = NextResponse.json({
