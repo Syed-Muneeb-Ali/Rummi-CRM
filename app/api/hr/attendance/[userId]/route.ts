@@ -21,13 +21,14 @@ export async function GET(
       const endDate = searchParams.get('endDate');
       const limit = parseInt(searchParams.get('limit') || '100', 10);
 
-      // Build query
+      // Build query with proper typing
       const query: Record<string, unknown> = { userId };
 
       if (startDate || endDate) {
-        query.date = {};
-        if (startDate) query.date.$gte = startDate;
-        if (endDate) query.date.$lte = endDate;
+        query.date = {
+          ...(startDate && { $gte: startDate }),
+          ...(endDate && { $lte: endDate }),
+        };
       }
 
       // Fetch attendance records
