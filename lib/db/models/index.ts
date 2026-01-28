@@ -7,6 +7,7 @@ export { default as FranchiseDeal } from "./franchise-deal"
 export { default as FranchisePayment } from "./franchise-payment"
 export { default as Franchise } from "./franchise"
 export { default as RentAgreement } from "./rent-agreement"
+export { default as Attendance } from "./attendance"
 
 // P1 Models
 export { default as CustomerDeal } from "./customer-deal"
