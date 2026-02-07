@@ -58,6 +58,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Sales & Customers",
     icon: ShoppingCart,
+    href: "/dashboard/sales",
     children: [
       { title: "My Sales", href: "/dashboard/sales/my-sales", icon: Briefcase },
       { title: "Sales Management", href: "/dashboard/sales/management", icon: ClipboardList },
@@ -68,6 +69,7 @@ const navigationItems: NavItem[] = [
   {
     title: "HO Sales",
     icon: Building2,
+    href: "/dashboard/ho-sales",
     children: [
       { title: "Franchise Leads", href: "/dashboard/ho-sales/leads", icon: UserPlus },
       { title: "Franchise Deals", href: "/dashboard/ho-sales/deals", icon: FileText },
@@ -80,6 +82,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Inventory",
     icon: Package,
+    href: "/dashboard/inventory",
     children: [
       { title: "All Units", href: "/dashboard/inventory/units", icon: Warehouse },
       { title: "Transfer Requests", href: "/dashboard/inventory/transfers", icon: ArrowRightLeft },
@@ -89,6 +92,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Finance",
     icon: Calculator,
+    href: "/dashboard/finance",
     children: [
       { title: "Finance Queue", href: "/dashboard/finance/queue", icon: ClipboardList },
     ],
@@ -96,6 +100,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Accounts",
     icon: CircleDollarSign,
+    href: "/dashboard/accounts",
     children: [
       { title: "Invoice Queue", href: "/dashboard/accounts/invoices", icon: Receipt },
       { title: "Expense Approvals", href: "/dashboard/accounts/expenses", icon: CreditCard },
@@ -105,6 +110,7 @@ const navigationItems: NavItem[] = [
   {
     title: "HR",
     icon: Users,
+    href: "/dashboard/hr",
     children: [
       { title: "Users", href: "/dashboard/hr/users", icon: Users },
       { title: "Franchises", href: "/dashboard/hr/franchises", icon: Building2 },
@@ -116,6 +122,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Transport",
     icon: Truck,
+    href: "/dashboard/transport",
     children: [
       { title: "Transport Requests", href: "/dashboard/transport/requests", icon: Truck },
     ],
@@ -123,6 +130,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Marketing",
     icon: Megaphone,
+    href: "/dashboard/marketing",
     children: [
       { title: "Expenses", href: "/dashboard/marketing/expenses", icon: CreditCard },
     ],
@@ -130,6 +138,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Reports",
     icon: BarChart3,
+    href: "/dashboard/reports",
     children: [
       { title: "Role-Based Reports", href: "/dashboard/reports", icon: BarChart3 },
     ],
@@ -137,6 +146,7 @@ const navigationItems: NavItem[] = [
   {
     title: "Settings",
     icon: Settings,
+    href: "/dashboard/settings",
     children: [
       { title: "Roles & Permissions", href: "/dashboard/settings/roles", icon: Shield },
       { title: "System Configuration", href: "/dashboard/settings/config", icon: Settings },
@@ -226,21 +236,18 @@ export function Sidebar({ isCollapsed = false }: SidebarProps) {
                           </Button>
                         </Link>
                       ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={cn(
-                            "w-full justify-center p-2",
-                            isSectionActive(item) && "bg-accent text-accent-foreground"
-                          )}
-                          onClick={() => {
-                            if (item.children && item.children.length === 1) {
-                              window.location.href = item.children[0].href!
-                            }
-                          }}
-                        >
-                          <item.icon className="h-5 w-5" />
-                        </Button>
+                        <Link href={item.href ?? (item.children?.[0]?.href ?? "/dashboard")}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "w-full justify-center p-2",
+                              isSectionActive(item) && "bg-accent text-accent-foreground"
+                            )}
+                          >
+                            <item.icon className="h-5 w-5" />
+                          </Button>
+                        </Link>
                       )}
                     </TooltipTrigger>
                     <TooltipContent side="right" sideOffset={10}>
@@ -265,48 +272,40 @@ export function Sidebar({ isCollapsed = false }: SidebarProps) {
                       </div>
                     </TooltipContent>
                   </Tooltip>
-                ) : item.href ? (
-                  // Direct link without children
-                  <Link href={item.href}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "w-full justify-start",
-                        isActive(item.href) &&
-                          "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span className="text-sm font-medium">{item.title}</span>
-                      </span>
-                    </Button>
-                  </Link>
-                ) : (
-                  // Section with children
+                ) : item.children && item.children.length > 0 ? (
+                  // Section with children - title links to dashboard, chevron toggles expand
                   <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
+                    <div
                       className={cn(
-                        "w-full justify-between",
+                        "flex items-center w-full rounded-md",
                         isSectionActive(item) && "bg-accent/50"
                       )}
-                      onClick={() => toggleExpanded(item.title)}
                     >
-                      <span className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span className="text-sm font-medium">{item.title}</span>
-                      </span>
+                      <Link
+                        href={item.href!}
+                        className="flex flex-1 items-center gap-2 px-2 py-1.5 text-sm font-medium hover:bg-accent/50 rounded-md transition-colors min-w-0"
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{item.title}</span>
+                      </Link>
                       {item.children && item.children.length > 0 && (
-                        expandedItems.includes(item.title) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 shrink-0"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            toggleExpanded(item.title)
+                          }}
+                        >
+                          {expandedItems.includes(item.title) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </Button>
                       )}
-                    </Button>
+                    </div>
                     {item.children &&
                       expandedItems.includes(item.title) && (
                         <div className="ml-4 mt-1 space-y-1">
@@ -329,6 +328,24 @@ export function Sidebar({ isCollapsed = false }: SidebarProps) {
                         </div>
                       )}
                   </>
+                ) : (
+                  // Direct link without children (e.g. Dashboard)
+                  <Link href={item.href ?? "/dashboard"}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start",
+                        isActive(item.href ?? "/dashboard") &&
+                          "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span className="text-sm font-medium">{item.title}</span>
+                      </span>
+                    </Button>
+                  </Link>
                 )}
                 {navigationItems.indexOf(item) < navigationItems.length - 1 && (
                   <Separator className="my-2" />
