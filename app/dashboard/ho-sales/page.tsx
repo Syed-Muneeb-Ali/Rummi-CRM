@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { QuickActionCard } from "@/components/dashboard/quick-action-card"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { FRANCHISE_DEAL_TYPE_LIST } from "@/lib/constants/franchise-deal-types"
 import {
   UserPlus,
   FileText,
@@ -28,24 +29,40 @@ export default function HOSalesDashboardPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
+        const requests: Promise<void>[] = []
+
         if (can("canManageFranchises") || can("canViewAllFranchises")) {
-          const res = await fetch("/api/hr/franchises?limit=1")
-          if (res.ok) {
-            const data = await res.json()
-            const total = data.pagination?.total ?? 0
-            setStats((prev) => ({
-              ...prev,
-              totalFranchises: total,
-              activeFranchises: total,
-            }))
-          }
+          requests.push(
+            fetch("/api/hr/franchises?limit=1").then(async (res) => {
+              if (!res.ok) return
+              const data = await res.json()
+              const total = data.pagination?.total ?? 0
+              setStats((prev) => ({ ...prev, totalFranchises: total, activeFranchises: total }))
+            })
+          )
         }
-        // Placeholder for pending payments and rent agreements
-        setStats((prev) => ({
-          ...prev,
-          pendingPayments: 0,
-          expiringRentAgreements: 0,
-        }))
+
+        if (can("canVerifyFranchisePayments")) {
+          requests.push(
+            fetch("/api/ho-sales/franchise-payments?status=pending&limit=1").then(async (res) => {
+              if (!res.ok) return
+              const data = await res.json()
+              setStats((prev) => ({ ...prev, pendingPayments: data.pagination?.total ?? 0 }))
+            })
+          )
+        }
+
+        if (can("canManageFranchises")) {
+          requests.push(
+            fetch("/api/ho-sales/rent-agreements?expiringWithinDays=30").then(async (res) => {
+              if (!res.ok) return
+              const data = await res.json()
+              setStats((prev) => ({ ...prev, expiringRentAgreements: (data.agreements || []).length }))
+            })
+          )
+        }
+
+        await Promise.all(requests)
       } catch (error) {
         console.error("Error fetching HO Sales stats:", error)
       } finally {
@@ -109,24 +126,18 @@ export default function HOSalesDashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border p-4">
-              <h4 className="font-semibold">Type A</h4>
-              <p className="text-sm text-muted-foreground">3 E-Rickshaws</p>
-              <p className="font-medium mt-2">₹6,83,000</p>
-              <p className="text-xs text-muted-foreground">₹7000 / ₹6000 / ₹5000 per tier</p>
-            </div>
-            <div className="rounded-lg border p-4">
-              <h4 className="font-semibold">Type B</h4>
-              <p className="text-sm text-muted-foreground">1 E-Rickshaw</p>
-              <p className="font-medium mt-2">₹3,83,000</p>
-              <p className="text-xs text-muted-foreground">₹9,000 flat</p>
-            </div>
-            <div className="rounded-lg border p-4">
-              <h4 className="font-semibold">Type C</h4>
-              <p className="text-sm text-muted-foreground">2 E-Rickshaws</p>
-              <p className="font-medium mt-2">₹5,83,000</p>
-              <p className="text-xs text-muted-foreground">₹6500 / ₹5000 / ₹4000 per tier</p>
-            </div>
+            {FRANCHISE_DEAL_TYPE_LIST.map((type) => (
+              <div key={type.code} className="rounded-lg border p-4">
+                <h4 className="font-semibold">Type {type.code}</h4>
+                <p className="text-sm text-muted-foreground">{type.eRickshawCount} E-Rickshaw{type.eRickshawCount > 1 ? "s" : ""}</p>
+                <p className="font-medium mt-2">₹{type.feeStructure.totalFee.toLocaleString("en-IN")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {type.commissionStructure.type === "flat"
+                    ? `₹${type.commissionStructure.flatRate?.toLocaleString("en-IN")} flat`
+                    : type.commissionStructure.tiers?.map((t) => `₹${t.amountPerSale}`).join(" / ") + " per tier"}
+                </p>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>

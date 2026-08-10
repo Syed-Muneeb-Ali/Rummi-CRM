@@ -5,10 +5,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import {
   MoreHorizontal,
-  Plus,
   Edit,
   Ban,
   Building2,
+  CheckCircle2,
 } from "lucide-react";
 
 import { ProtectedRoute } from "@/components/auth/protected-route";
@@ -24,8 +24,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { DataTable, DataTableColumnHeader } from "@/components/common/data-table";
-import { CreateFranchiseModal } from "@/components/hr/create-franchise-modal";
+import { ActivateFranchiseModal } from "@/components/hr/activate-franchise-modal";
 import { EditFranchiseModal } from "@/components/hr/edit-franchise-modal";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface Address {
   line1: string;
@@ -59,12 +60,22 @@ interface Owner {
   empId: string;
 }
 
+interface ActivatableDeal {
+  _id: string;
+  dealNumber: string;
+  buyerName: string;
+  dealType?: "A" | "B" | "C";
+  buyerAddress: Address;
+}
+
 function FranchisesManagementContent() {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
   const [owners, setOwners] = useState<Owner[]>([]);
+  const [activatableDeals, setActivatableDeals] = useState<ActivatableDeal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [activateModalOpen, setActivateModalOpen] = useState(false);
+  const [dealToActivate, setDealToActivate] = useState<ActivatableDeal | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedFranchise, setSelectedFranchise] = useState<Franchise | null>(null);
 
@@ -273,6 +284,20 @@ function FranchisesManagementContent() {
     }
   };
 
+  const fetchActivatableDeals = async () => {
+    try {
+      const response = await fetch("/api/ho-sales/franchise-deals?stage=inventory_allocated&limit=100");
+      if (!response.ok) {
+        console.error("Failed to fetch activatable deals:", response.status);
+        return;
+      }
+      const data = await response.json();
+      setActivatableDeals(data.deals || []);
+    } catch (error) {
+      console.error("Error fetching activatable deals:", error);
+    }
+  };
+
   const handleSuspend = async (franchiseId: string) => {
     if (!confirm("Are you sure you want to suspend this franchise?")) return;
 
@@ -295,7 +320,7 @@ function FranchisesManagementContent() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchFranchises(), fetchOwners()]);
+      await Promise.all([fetchFranchises(), fetchOwners(), fetchActivatableDeals()]);
       setLoading(false);
     };
 
@@ -326,18 +351,49 @@ function FranchisesManagementContent() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold">Franchises Management</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage franchise entities and their details
-          </p>
-        </div>
-        <Button onClick={() => setCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Franchise
-        </Button>
+      <div>
+        <h2 className="text-3xl font-bold">Franchises Management</h2>
+        <p className="text-muted-foreground mt-1">
+          Manage franchise entities and their details
+        </p>
       </div>
+
+      {/* Activatable Deals - franchise deals that have reached inventory_allocated */}
+      {activatableDeals.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Deals Ready to Activate</CardTitle>
+            <CardDescription>
+              Verified franchise deals with documents uploaded and inventory allocated
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {activatableDeals.map((deal) => (
+              <div
+                key={deal._id}
+                className="flex items-center justify-between rounded-md border p-3"
+              >
+                <div>
+                  <div className="font-medium">{deal.buyerName}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {deal.dealNumber} &middot; Type {deal.dealType}
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setDealToActivate(deal);
+                    setActivateModalOpen(true);
+                  }}
+                >
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  Activate
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Data Table */}
       <DataTable
@@ -350,10 +406,17 @@ function FranchisesManagementContent() {
       />
 
       {/* Modals */}
-      <CreateFranchiseModal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onSuccess={fetchFranchises}
+      <ActivateFranchiseModal
+        open={activateModalOpen}
+        onClose={() => {
+          setActivateModalOpen(false);
+          setDealToActivate(null);
+        }}
+        onSuccess={() => {
+          fetchFranchises();
+          fetchActivatableDeals();
+        }}
+        deal={dealToActivate}
         owners={owners}
       />
 

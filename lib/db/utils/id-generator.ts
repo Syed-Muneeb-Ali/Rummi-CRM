@@ -42,9 +42,9 @@ export async function generateId(prefix: string): Promise<string> {
         },
       },
     ],
-    { new: true, upsert: true }
+    { new: true, upsert: true, updatePipeline: true }
   )
-  
+
   const sequenceNumber = String(counter.seq).padStart(3, "0")
   return `${prefix}-${currentMonth}-${sequenceNumber}`
 }
