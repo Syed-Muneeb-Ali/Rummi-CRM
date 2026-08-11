@@ -77,11 +77,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 <Button variant="ghost" className="flex items-center gap-3 px-3">
                   <div
                     className="flex h-8 w-8 items-center justify-center rounded-full"
-                    style={{ backgroundColor: "hsl(214, 82%, 95%)" }}
+                    style={{ backgroundColor: "hsl(68, 45%, 93%)" }}
                   >
                     <User
                       className="h-4 w-4"
-                      style={{ color: "hsl(214, 82%, 48%)" }}
+                      style={{ color: "hsl(68, 60%, 27%)" }}
                     />
                   </div>
                   <div className="hidden text-left sm:block">

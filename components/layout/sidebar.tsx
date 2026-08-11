@@ -204,7 +204,7 @@ export function Sidebar({ isCollapsed = false }: SidebarProps) {
           <Link href="/dashboard" className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-              style={{ backgroundColor: "hsl(214, 82%, 48%)", color: "white" }}
+              style={{ backgroundColor: "hsl(68, 60%, 27%)", color: "white" }}
             >
               <Briefcase className="w-5 h-5" />
             </div>

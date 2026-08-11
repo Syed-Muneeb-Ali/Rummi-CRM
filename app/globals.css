@@ -33,6 +33,10 @@
   --color-secondary: hsl(var(--secondary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-primary: hsl(var(--primary));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: hsl(var(--card-foreground));
@@ -47,33 +51,40 @@
 }
 
 :root {
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
-  --popover: 210 20% 98%;
-  --popover-foreground: 222 47% 11%;
+  /* Rummi brand palette, extracted from the company brochure:
+     lime-olive green (logo bands) as primary, gold (RUMMI wordmark) as accent,
+     brand red/yellow reused for destructive/warning since they already matched. */
+  --background: 60 20% 98%;
+  --foreground: 0 5% 13%;
+  --popover: 60 20% 98%;
+  --popover-foreground: 0 5% 13%;
 
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 0 5% 13%;
 
-  --primary: 214 82% 48%;   /* Rummi Blue - Darker for professionalism */
+  --primary: 68 60% 27%;      /* Rummi lime-green, darkened for AA contrast with white text */
   --primary-foreground: 0 0% 100%;
+  --primary-light: 68 45% 93%; /* soft tint for icon circles / highlighted rows */
+  --primary-lighter: 68 45% 97%; /* near-white wash for gradients */
 
-  --secondary: 240 10% 45%;  /* Dark neutral for better contrast */
+  --secondary: 240 10% 45%;   /* Dark neutral, unchanged */
   --secondary-foreground: 0 0% 100%;
 
-  --accent: 29 100% 55%;     /* Warm orange for CRM actions */
+  --accent: 39 60% 34%;       /* Rummi gold, darkened from the wordmark for AA contrast */
   --accent-foreground: 0 0% 100%;
 
-  --muted: 210 20% 96%;
-  --muted-foreground: 222 47% 30%;
+  --muted: 60 10% 96%;
+  --muted-foreground: 30 5% 30%;
 
-  --success: 142 71% 45%;    /* Green for positive actions */
-  --destructive: 0 84% 60%;  /* Red for destructive actions */
-  --warning: 38 92% 50%;     /* Amber for alerts */
+  --success: 149 65% 28%;     /* Green from the logo's house icon */
+  --destructive: 358 75% 46%; /* Brand red, darkened slightly for AA contrast */
+  --destructive-foreground: 0 0% 100%;
+  --warning: 45 90% 52%;      /* Brand yellow accent */
+  --warning-foreground: 0 5% 13%; /* warning bg is light - pair with dark text, not white */
 
-  --border: 214 20% 85%;
-  --input: 214 20% 85%;
-  --ring: 214 82% 48%;
+  --border: 68 20% 85%;
+  --input: 68 20% 85%;
+  --ring: 68 60% 27%;
 }
 
 

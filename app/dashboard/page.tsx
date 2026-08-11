@@ -88,9 +88,9 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <div
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: "hsl(214, 82%, 95%)" }}
+                style={{ backgroundColor: "hsl(68, 45%, 93%)" }}
               >
-                <User className="w-5 h-5" style={{ color: "hsl(214, 82%, 48%)" }} />
+                <User className="w-5 h-5" style={{ color: "hsl(68, 60%, 27%)" }} />
               </div>
               <div>
                 <CardTitle className="text-lg">Account Information</CardTitle>

@@ -126,16 +126,16 @@ export default function LoginPage() {
   }
   
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ 
-      background: 'linear-gradient(to bottom right, hsl(210, 20%, 98%), hsl(210, 20%, 98%), hsl(214, 82%, 98%))'
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{
+      background: 'linear-gradient(to bottom right, hsl(60, 20%, 98%), hsl(60, 20%, 98%), hsl(68, 45%, 97%))'
     }}>
       <div className="w-full max-w-md space-y-6">
         {/* Logo/Brand Section */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg" style={{ backgroundColor: 'hsl(214, 82%, 48%)', color: 'white' }}>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg" style={{ backgroundColor: 'hsl(68, 60%, 27%)', color: 'white' }}>
             <LogIn className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-bold" style={{ color: 'hsl(222, 47%, 11%)' }}>Rummi CRM</h1>
+          <h1 className="text-3xl font-bold" style={{ color: 'hsl(0, 5%, 13%)' }}>Rummi CRM</h1>
           <p className="text-muted-foreground">Franchise Sales & Operations Platform</p>
         </div>
 
@@ -201,8 +201,8 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="w-full h-11 text-base font-medium shadow-md hover:shadow-lg transition-all"
-                style={{ 
-                  backgroundColor: isLoading ? 'hsl(214, 82%, 65%)' : 'hsl(214, 82%, 48%)',
+                style={{
+                  backgroundColor: isLoading ? 'hsl(68, 50%, 45%)' : 'hsl(68, 60%, 27%)',
                   color: 'white'
                 }}
                 disabled={isLoading}
